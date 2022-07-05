@@ -1,5 +1,6 @@
 import requests
 import click
+import os
 
 @click.command()
 @click.argument('query_type', type=str)
@@ -20,9 +21,19 @@ def run(query_type):
     query_type.lower()
     # pass the query type into the main function
     query(query_type)
-
+    
 
 def get_data(data, query_type):
+    """ Data filtering function
+
+    Args:
+        data (dict): the data to filter through
+        query_type (str): the type of data to look for
+
+    Returns:
+        str: returns the desired data
+    """
+    
     asset = None
     # iterate over assets
     for asset in data:
@@ -39,6 +50,12 @@ def get_data(data, query_type):
     return None
 
 def query(query_type):
+    """ the main function
+
+    Args:
+        query_type (str): the type of data to look for
+    """
+    
     # get the latest release information
     result = requests.get("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest").json()
     # initialize empty data str
