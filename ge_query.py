@@ -82,13 +82,13 @@ def query(query_type):
         query_type (str): the type of data to look for
     """
     
-    # get the latest release information
-    
+    # initialize empty headers dict
     headers = {}
-    
+    # grab token from auth.json
     with open("auth.json", "r") as f:
         headers = json.load(f)
     
+    # get latest release information
     result = requests.get("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest", headers=headers).json()
     # make an assets dir, this will contain all of the latest release information
     assets = result["assets"]
