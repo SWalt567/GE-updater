@@ -1,6 +1,7 @@
 import requests
 import click
 import os
+import json
 
 @click.command()
 @click.argument('query_type', type=str)
@@ -82,7 +83,13 @@ def query(query_type):
     """
     
     # get the latest release information
-    result = requests.get("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest").json()
+    
+    headers = {}
+    
+    with open("auth.json", "r") as f:
+        headers = json.load(f)
+    
+    result = requests.get("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest", headers=headers).json()
     # make an assets dir, this will contain all of the latest release information
     assets = result["assets"]
     
