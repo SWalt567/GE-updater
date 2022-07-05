@@ -9,19 +9,23 @@ def run(query_type):
     
     this script accesses the GE-proton git repo to either:
     a) return the tarball download link, or;
-    b) return the name of the release
+    b) return the name of the release, or;
+    c) check if the update is already installed
 
     Args:
-        query_type (str): choose either "url" or "name" to get the respective data
+        query_type (str): choose either "url" or "name" to 
+        get the respective data, or "check" to check if the 
+        update is already installed
 
     Returns:
         str: either the tarball download URL or the tarball filename
     """
     
-    query_type.lower()
+    # filter user input
+    query_type = str(query_type).lower()
+    
     # pass the query type into the main function
     query(query_type)
-    
 
 def get_data(data, query_type):
     """ Data filtering function
@@ -49,6 +53,27 @@ def get_data(data, query_type):
     # return nothing if the tar can't be found
     return None
 
+def can_update(data):
+    """ Release check
+    
+    Compares the newest release with what is currently installed in
+    order to avoid downloading the same update twice
+
+    Args:
+        data (dir): the data of the current release
+        
+    Returns:
+        True if already up-to-date, else false
+    """
+    
+    # get the current GE-proton version
+    current = get_data(data, "name")
+    # get the path to .steam/root/compatibilitytools.d/
+    path = os.path.expanduser("~/.steam/root/compatibilitytools.d/")
+    versions = os.listdir(path)
+    
+    return False if current[:-7] in versions else True
+
 def query(query_type):
     """ the main function
 
@@ -58,11 +83,12 @@ def query(query_type):
     
     # get the latest release information
     result = requests.get("https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest").json()
-    # initialize empty data str
-    data = ""
-    # find the specified data
-    data = get_data(result["assets"], query_type)
-
-    print(data)
+    # make an assets dir, this will contain all of the latest release information
+    assets = result["assets"]
+    
+    if query_type == "check":
+        print(can_update(assets))
+    else:
+        print(get_data(assets, query_type))
 
 run()

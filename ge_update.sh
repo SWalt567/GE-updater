@@ -31,23 +31,29 @@ while [ "$1" != "" ]; do
     shift
 done
 
-echo "grabbing url"
+echo "checking for avaliable updates"
+can_update=$(python ge_query.py check)
 
-# grab the tarball url
-tar_url=$(python ge_query.py url)
-# grab the tarball name
-tar_name=$(python ge_query.py name)
+if [ "$can_update" = "False" ]; then
+    echo "Already up to date!"
+else
+    echo "grabbing url"
+    # grab the tarball url
+    tar_url=$(python ge_query.py url)
+    # grab the tarball name
+    tar_name=$(python ge_query.py name)
 
-echo "navigating to .steam/root/compatibilitytools.d/"
-cd /home/$USER/.steam/root/compatibilitytools.d/
+    echo "navigating to .steam/root/compatibilitytools.d/"
+    cd /home/$USER/.steam/root/compatibilitytools.d/
 
-echo $tar_url
-echo $tar_name
+    # download the tarball
+    wget $tar_url
 
-wget $tar_url
+    echo "extracting tarball"
+    tar -xf $tar_name -C /home/$USER/.steam/root/compatibilitytools.d/
+    echo "extraction done"
 
-echo "extracting tarball"
-tar -xf $tar_name -C /home/$USER/.steam/root/compatibilitytools.d/
-
-echo "removing tarball"
-rm $tar_name
+    echo "removing tarball"
+    rm $tar_name
+    echo "done!"
+fi
